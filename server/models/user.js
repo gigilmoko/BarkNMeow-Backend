@@ -46,6 +46,35 @@ const schema = new mongoose.Schema({
     public_id: String,
     url: String,
   },
+  signInMethod: {
+    type: String,
+    enum: ['local', 'google','facebook'],
+    required: false,
+  },
+  googleId: {
+    type: String,
+    required: false,
+    unique: true,
+  },
+  contactRequest: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }
+  ],
+  contacts: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      unique: true,
+    }
+  ],
+  sentContactRequest: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }
+  ],
   otp: Number,
   otp_expire: Date,
 });
