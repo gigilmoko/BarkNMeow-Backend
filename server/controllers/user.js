@@ -1,7 +1,7 @@
 import { User } from "../models/user.js";
 import ErrorHandler from "../utils/error.js";
 import { asyncError } from "../middlewares/error.js";
-import { cookieOptions, getDataUri, sendEmail, sendToken } from "../utils/features.js";
+import { cookieOptions, getDataUri, sendEmail, sendToken, imageUriToDataUri } from "../utils/features.js";
 import { passwordResetEmailTemplate } from "../utils/emailHTMLTemplate.js";
 import cloudinary from "cloudinary";
 
@@ -26,21 +26,48 @@ export const login = async (req, res, next) => {
 };
 
 export const signup = asyncError(async (req, res, next) => {
-  const { name, email, password, address, city, country, pinCode } = req.body;
+  const { name, email, password, address, city, country, pinCode, googleId } = req.body;
 
   let user = await User.findOne({ email });
 
   if (user) return next(new ErrorHandler("User Already Exist", 400));
+  let signInMethod = 'local';
+  if (googleId !== undefined) {
+    signInMethod = 'google'
+
+  }
+
 
   let avatar = undefined;
 
   if (req.file) {
+
+
     const file = getDataUri(req.file);
     const myCloud = await cloudinary.v2.uploader.upload(file.content);
     avatar = {
       public_id: myCloud.public_id,
       url: myCloud.secure_url,
     };
+
+
+  }
+  else {
+    let dataUri;
+  
+    console.log(req.body.file)
+    if (req.body.file) {
+      if (googleId !== undefined) {
+        dataUri = await imageUriToDataUri(req.body.file);
+      }
+
+      const myCloud = await cloudinary.v2.uploader.upload(dataUri);
+      avatar = {
+        public_id: myCloud.public_id,
+        url: myCloud.secure_url,
+      };
+    }
+
   }
 
   user = await User.create({
@@ -52,9 +79,29 @@ export const signup = asyncError(async (req, res, next) => {
     city,
     country,
     pinCode,
+    googleId,
+    signInMethod,
   });
 
   sendToken(user, res, `Registered Successfully`, 201);
+});
+
+export const getAllUsers = asyncError (async (req, res) => {
+  const loggedInUserId = req.user._id;
+
+  try {
+      const users = await User.find({ _id: { $ne: loggedInUserId } })
+      res.status(200).json({
+          success: true,
+          users
+      });
+
+  } catch (err) {
+      console.log("Error retrieving users", err);
+
+      res.status(500).json({ message: "Error retrieving users" });
+  }
+
 });
 
 export const getMyProfile = asyncError(async (req, res, next) => {
@@ -90,7 +137,12 @@ export const updateProfile = asyncError(async (req, res, next) => {
   if (city) user.city = city;
   if (country) user.country = country;
   if (pinCode) user.pinCode = pinCode;
-
+  if (user.googleId){
+    user.signInMethod = 'google';
+  }
+  else{
+    user.signInMethod = 'local';
+  }
   await user.save();
 
   res.status(200).json({
@@ -203,3 +255,14 @@ export const resetPassword = asyncError(async (req, res, next) => {
   });
 });
 
+export const googleLogin = asyncError(async (req, res, next) => {
+  const user = await User.findOne({ googleId: req.payload.sub });
+
+
+  if (!user) {
+
+    return next(new ErrorHandler("Invalid ID", 400));
+  }
+
+  sendToken(user, res, `Welcome Back, ${user.name}`, 200);
+})
