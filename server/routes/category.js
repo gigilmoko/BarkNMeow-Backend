@@ -13,7 +13,7 @@ import {
 } from "../controllers/category.js";
 
 router.get("/all", getAllCategories);
-router.post("/new", isAuthenticated, isAdmin, createcategory);
+router.post("/new", isAuthenticated, isAdmin, singleUpload, createcategory);
 router
     .route("/single/:id")
     .get(getCategoryDetails)
