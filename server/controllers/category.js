@@ -39,20 +39,28 @@ export const getCategoryDetails = asyncError(async (req, res, next) => {
 });
 
 export const createcategory = asyncError(async (req, res, next) => {
-    const { category} = req.body;
+    const { category } = req.body;
     
-    if (!req.file) return next(new ErrorHandler("Please add image", 400));
+    if (!req.files || req.files.length === 0) {
+        return next(new ErrorHandler("Please add at least one image", 400));
+    }
     
-    const file = getDataUri(req.file);
-    const myCloud = await cloudinary.v2.uploader.upload(file.content);
-    const image = {
-        public_id: myCloud.public_id,
-        url: myCloud.secure_url,
-    };
+    const images = [];
     
+    for (const file of req.files) {
+        const dataUri = getDataUri(file);
+        const myCloud = await cloudinary.v2.uploader.upload(dataUri.content);
+        const image = {
+            public_id: myCloud.public_id,
+            url: myCloud.secure_url,
+        };
+        images.push(image);
+    }
+    
+    // Create the category with the array of images
     await Category.create({
         category,
-        images: [image],
+        images,
     });
     
     res.status(200).json({
@@ -60,6 +68,7 @@ export const createcategory = asyncError(async (req, res, next) => {
         message: "Category Created Successfully",
     });
 });
+
 
 export const updateCategory = asyncError(async (req, res, next) => {
     const { category} = req.body;
