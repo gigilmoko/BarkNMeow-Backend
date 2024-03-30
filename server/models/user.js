@@ -54,7 +54,6 @@ const schema = new mongoose.Schema({
   googleId: {
     type: String,
     required: false,
-    unique: true,
   },
   contactRequest: [
     {
@@ -66,7 +65,6 @@ const schema = new mongoose.Schema({
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      unique: true,
     }
   ],
   sentContactRequest: [

@@ -29,10 +29,9 @@ export const signup = asyncError(async (req, res, next) => {
   const { name, email, password, address, city, country, pinCode, googleId } = req.body;
 
   let user = await User.findOne({ email });
-
   if (user) return next(new ErrorHandler("User Already Exist", 400));
   let signInMethod = 'local';
-  if (googleId !== undefined) {
+  if (googleId !== undefined && googleId !== null && googleId !== "" && googleId !== "undefined") {
     signInMethod = 'google'
 
   }
