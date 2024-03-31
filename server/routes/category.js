@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-import { singleUpload } from "../middlewares/multer.js";
+import { multipleUpload, singleUpload } from "../middlewares/multer.js";
 import { isAuthenticated, isAdmin } from "../middlewares/auth.js";
 import {
     createcategory,
@@ -13,7 +13,7 @@ import {
 } from "../controllers/category.js";
 
 router.get("/all", getAllCategories);
-router.post("/new", isAuthenticated, isAdmin, singleUpload, createcategory);
+router.post("/new", isAuthenticated, isAdmin, multipleUpload, createcategory);
 router
     .route("/single/:id")
     .get(getCategoryDetails)
@@ -21,7 +21,7 @@ router
     .delete(isAuthenticated, isAdmin, deleteCategory);
 router
     .route("/images/:id")
-    .post(isAuthenticated, isAdmin, singleUpload, addCategoryImage)
+    .post(isAuthenticated, isAdmin, multipleUpload, addCategoryImage)
     .delete(isAuthenticated, isAdmin, deleteCategoryImage);
 
 

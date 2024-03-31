@@ -10,7 +10,7 @@ import {
   updateProduct,
 } from "../controllers/product.js";
 import { isAuthenticated, isAdmin } from "../middlewares/auth.js";
-import { singleUpload } from "../middlewares/multer.js";
+import { multipleUpload } from "../middlewares/multer.js";
 
 const router = express.Router();
 
@@ -23,11 +23,11 @@ router
   .put(isAuthenticated, isAdmin, updateProduct)
   .delete(isAuthenticated, isAdmin, deleteProduct);
 
-router.post("/new", isAuthenticated, isAdmin, singleUpload, createProduct);
+router.post("/new", isAuthenticated, isAdmin, multipleUpload, createProduct);
 
 router
   .route("/images/:id")
-  .post(isAuthenticated, isAdmin, singleUpload, addProductImage)
+  .post(isAuthenticated, isAdmin, multipleUpload, addProductImage)
   .delete(isAuthenticated, isAdmin, deleteProductImage);
 
 
