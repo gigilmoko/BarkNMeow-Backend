@@ -6,26 +6,42 @@ import { Category } from "../models/category.js";
 
 
 export const addCategoryImage = asyncError(async (req, res, next) => {
-    const category = await Category.findById(req.params.id);
-    if (!category) return next(new ErrorHandler("Category not found", 404));
+    const categoryId = req.params.id;
+    const category = await Category.findById(categoryId);
+    if (!category) {
+        return next(new ErrorHandler("Category not found", 404));
+    }
 
-    if (!req.file) return next(new ErrorHandler("Please add image", 400));
+    if (!req.files || req.files.length === 0) {
+        return next(new ErrorHandler("Please add images", 400));
+    }
 
-    const file = getDataUri(req.file);
-    const myCloud = await cloudinary.v2.uploader.upload(file.content);
-    const image = {
-        public_id: myCloud.public_id,
-        url: myCloud.secure_url,
-    };
+    try {
+        const uploadedImages = await Promise.all(req.files.map(async (file) => {
+            const dataUri = getDataUri(file);
+            const myCloud = await cloudinary.v2.uploader.upload(dataUri.content);
+            return {
+                public_id: myCloud.public_id,
+                url: myCloud.secure_url,
+            };
+        }));
 
-    category.images.push(image);
-    await category.save();
+        // Append the uploaded images to the category's images array
+        category.images.push(...uploadedImages);
 
-    res.status(200).json({
-        success: true,
-        message: "Image Added Successfully",
-    });
+        // Save the category with the new images
+        await category.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Images added successfully",
+            images: uploadedImages // Optionally, send back the uploaded images for further processing
+        });
+    } catch (error) {
+        next(error);
+    }
 });
+
 
 export const getCategoryDetails = asyncError(async (req, res, next) => {
     const category = await Category.findById(req.params.id).populate("category");
