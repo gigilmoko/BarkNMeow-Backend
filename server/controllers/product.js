@@ -53,22 +53,32 @@ export const getProductDetails = asyncError(async (req, res, next) => {
 export const createProduct = asyncError(async (req, res, next) => {
   const { name, description, category, price, stock } = req.body;
 
-  if (!req.file) return next(new ErrorHandler("Please add image", 400));
+  // Check if there are any images in the request
+  if (!req.files || req.files.length === 0) {
+    return next(new ErrorHandler("Please add at least one image", 400));
+  }
 
-  const file = getDataUri(req.file);
-  const myCloud = await cloudinary.v2.uploader.upload(file.content);
-  const image = {
-    public_id: myCloud.public_id,
-    url: myCloud.secure_url,
-  };
+  const images = [];
 
+  // Iterate over each image file in the request
+  for (const file of req.files) {
+    const dataUri = getDataUri(file);
+    const myCloud = await cloudinary.v2.uploader.upload(dataUri.content);
+    const image = {
+      public_id: myCloud.public_id,
+      url: myCloud.secure_url,
+    };
+    images.push(image);
+  }
+
+  // Create the product with the array of images
   await Product.create({
     name,
     description,
     category,
     price,
     stock,
-    images: [image],
+    images,
   });
 
   res.status(200).json({
