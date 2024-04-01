@@ -62,8 +62,11 @@ export const createOrder = asyncError(async (req, res, next) => {
     await product.save();
   }
 
+  let emailSent = false;
+
   try {
     await sendEmail("Order Preparing", req.user.email, preparingTemplate(order));
+    emailSent = true;
   } catch (error) {
     console.error("Error sending email:", error);
   }
@@ -71,6 +74,7 @@ export const createOrder = asyncError(async (req, res, next) => {
   res.status(201).json({
     success: true,
     message: "Order Placed Successfully",
+    emailSent
   });
 });
 
