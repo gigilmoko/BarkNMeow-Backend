@@ -67,9 +67,9 @@ export const createOrder = asyncError(async (req, res, next) => {
   res.status(201).json({
     success: true,
     message: "Order Placed Successfully",
-    emailSent
+    
   });
-  
+
   if (success) {
     try {
       await sendEmail("Order Preparing", req.user.email, preparingTemplate(order));
