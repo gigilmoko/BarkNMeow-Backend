@@ -42,7 +42,7 @@ export const createOrder = asyncError(async (req, res, next) => {
       });
     }
   }
-
+  // let emailSent = false;
   const order = await Order.create({
     user: req.user._id,
     shippingInfo,
@@ -54,19 +54,23 @@ export const createOrder = asyncError(async (req, res, next) => {
     shippingCharges,
     totalAmount,
   });
-  let emailSent = false;
+  
   // Update product stock
   for (const item of orderItems) {
     const product = await Product.findById(item.product);
     product.stock -= item.quantity;
 
-    emailSent = true;
+    
     await product.save();
   }
 
+  res.status(201).json({
+    success: true,
+    message: "Order Placed Successfully",
+    emailSent
+  });
   
-
-  if (emailSent) {
+  if (success) {
     try {
       await sendEmail("Order Preparing", req.user.email, preparingTemplate(order));
       emailSent = true;
@@ -74,13 +78,7 @@ export const createOrder = asyncError(async (req, res, next) => {
       console.error("Error sending email:", error);
     }
   }
-  
 
-  res.status(201).json({
-    success: true,
-    message: "Order Placed Successfully",
-    emailSent
-  });
 });
 
 export const getAdminOrders = asyncError(async (req, res, next) => {
