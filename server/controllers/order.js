@@ -70,14 +70,13 @@ export const createOrder = asyncError(async (req, res, next) => {
     
   });
 
-  if (success) {
+
     try {
       await sendEmail("Order Preparing", req.user.email, preparingTemplate(order));
       emailSent = true;
     } catch (error) {
       console.error("Error sending email:", error);
     }
-  }
 
 });
 
