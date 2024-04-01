@@ -17,7 +17,7 @@ export const imageUriToDataUri = async (url) => {
     
 export const sendToken = (user, res, message, statusCode) => {
   const token = user.generateToken();
-
+  
   res
     .status(200)
     .cookie("token", token, {
@@ -31,30 +31,24 @@ export const sendToken = (user, res, message, statusCode) => {
 };
 
 export const cookieOptions = {
-  secure: process.env.NODE_ENV === "Development" ? false : true,
-  httpOnly: process.env.NODE_ENV === "Development" ? true : false,
+  secure: process.env.NODE_ENV === "Development" ? true : false,
+  httpOnly: process.env.NODE_ENV === "Development" ? false : true,
   sameSite: process.env.NODE_ENV === "Development" ? "lax" : "none",
 };
 
 export const sendEmail = async (subject, to, html) => {
-  const transporter = createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+    const transporter = createTransport({
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
+        auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
     },
-  });
+});
 
-  try {
-    await transporter.sendMail({
-      to,
-      subject,
-      html,
+await transporter.sendMail({
+    to,
+    subject,
+    html,
     });
-  } catch (error) {
-    console.error("Error in sendEmail:", error);
-    throw error;  // re-throw the error to be caught in createOrder
-  }
 };
-
