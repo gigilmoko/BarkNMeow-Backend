@@ -1,3 +1,4 @@
+// const User = require('../models/user');
 
 const passwordResetEmailTemplate = `
 <!DOCTYPE html>
@@ -20,6 +21,8 @@ const passwordResetEmailTemplate = `
 `;
 
 const preparingTemplate = (order) => {
+    // const user = await User.findOne(order.user);
+
     const orderItemsTable = `
         <table style="border-collapse: collapse; width: 100%;">
             <thead>
@@ -32,8 +35,8 @@ const preparingTemplate = (order) => {
             </thead>
             <tbody>
                 ${order.orderItems
-                    .map(
-                        (item) => `
+            .map(
+                (item) => `
                             <tr>
                                 <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;"><img src="${item.image}" alt="${item.name}" style="max-width: 100px;"></td>
                                 <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">${item.name}</td>
@@ -41,8 +44,8 @@ const preparingTemplate = (order) => {
                                 <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">${item.quantity}</td>
                             </tr>
                         `
-                    )
-                    .join("")}
+            )
+            .join("")}
             </tbody>
         </table>
     `;
@@ -75,8 +78,8 @@ const shippedTemplate = (order) => {
             </thead>
             <tbody>
                 ${order.orderItems
-                    .map(
-                        (item) => `
+            .map(
+                (item) => `
                             <tr>
                                 <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;"><img src="${item.image}" alt="${item.name}" style="max-width: 100px;"></td>
                                 <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">${item.name}</td>
@@ -84,8 +87,8 @@ const shippedTemplate = (order) => {
                                 <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">${item.quantity}</td>
                             </tr>
                         `
-                    )
-                    .join("")}
+            )
+            .join("")}
             </tbody>
         </table>
     `;
@@ -118,8 +121,8 @@ const deliveredTemplate = (order) => {
             </thead>
             <tbody>
                 ${order.orderItems
-                    .map(
-                        (item) => `
+            .map(
+                (item) => `
                             <tr>
                                 <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;"><img src="${item.image}" alt="${item.name}" style="max-width: 100px;"></td>
                                 <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">${item.name}</td>
@@ -127,8 +130,8 @@ const deliveredTemplate = (order) => {
                                 <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">${item.quantity}</td>
                             </tr>
                         `
-                    )
-                    .join("")}
+            )
+            .join("")}
             </tbody>
         </table>
     `;
@@ -149,4 +152,4 @@ const deliveredTemplate = (order) => {
 };
 
 
-export { passwordResetEmailTemplate, preparingTemplate, shippedTemplate, deliveredTemplate  };
+export { passwordResetEmailTemplate, preparingTemplate, shippedTemplate, deliveredTemplate };

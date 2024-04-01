@@ -5,6 +5,7 @@ import { stripe } from "../server.js";
 import ErrorHandler from "../utils/error.js";
 import { preparingTemplate, shippedTemplate, deliveredTemplate } from "../utils/emailHTMLTemplate.js";
 import { sendEmail } from "../utils/features.js";
+import { sendReceipt } from '../utils/sendReceipt.js';
 
 export const processPayment = asyncError(async (req, res, next) => {
   const { totalAmount } = req.body;
@@ -62,11 +63,13 @@ export const createOrder = asyncError(async (req, res, next) => {
     await product.save();
   }
 
-  try {
-    await sendEmail("Order Preparing", req.user.email, preparingTemplate(order));
-  } catch (error) {
-    console.error("Error sending email:", error);
-  }
+  // try {
+  //   await sendEmail("Order Preparing", req.user.email, preparingTemplate(order));
+  // } catch (error) {
+  //   console.error("Error sending email:", error);
+  // }
+
+  await sendReceipt(order);
 
   res.status(201).json({
     success: true,
