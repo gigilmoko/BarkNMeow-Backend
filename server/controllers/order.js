@@ -72,8 +72,11 @@ export const createOrder = asyncError(async (req, res, next) => {
 
 
     try {
+      console.log("User's email:", req.user.email);
+      console.log("Order:", order);
       await sendEmail("Order Preparing", req.user.email, preparingTemplate(order));
-      
+      console.log("User's email passed");
+      console.log("Order passed");
     } catch (error) {
       console.error("Error sending email:", error);
     }
