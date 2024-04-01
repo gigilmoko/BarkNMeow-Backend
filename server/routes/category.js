@@ -12,18 +12,18 @@ import {
     getAllCategories
 } from "../controllers/category.js";
 
-router.get("/all", getAllCategories); // Get all categories
-router.post("/new", isAuthenticated, isAdmin, multipleUpload, createcategory); // Create a new category
+router.get("/all", getAllCategories);
+router.post("/new", isAuthenticated, isAdmin, multipleUpload, createcategory);
 router
     .route("/single/:id")
-    .get(getCategoryDetails) // Get details of a single category
-    .put(isAuthenticated, isAdmin, updateCategory) // Update a single category
-    .delete(isAuthenticated, isAdmin, deleteCategory); // Delete a single category
+    .get(getCategoryDetails)
+    .put(isAuthenticated, isAdmin, updateCategory)
+    .delete(isAuthenticated, isAdmin, deleteCategory);
 
 router
     .route("/images/:id")
-    .post(isAuthenticated, isAdmin, multipleUpload, addCategoryImage) // Add images to a category
-    .delete(isAuthenticated, isAdmin, deleteCategoryImage); // Delete an image from a category
+    .post(isAuthenticated, isAdmin, multipleUpload, addCategoryImage)
+    .delete(isAuthenticated, isAdmin, deleteCategoryImage);
 
 
 

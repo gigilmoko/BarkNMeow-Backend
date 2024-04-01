@@ -111,23 +111,29 @@ export const addProductImage = asyncError(async (req, res, next) => {
   const product = await Product.findById(req.params.id);
   if (!product) return next(new ErrorHandler("Product not found", 404));
 
-  if (!req.file) return next(new ErrorHandler("Please add image", 400));
+  if (!req.files || req.files.length === 0) return next(new ErrorHandler("Please add images", 400));
 
-  const file = getDataUri(req.file);
-  const myCloud = await cloudinary.v2.uploader.upload(file.content);
-  const image = {
-    public_id: myCloud.public_id,
-    url: myCloud.secure_url,
-  };
+  const images = [];
 
-  product.images.push(image);
+  for (const file of req.files) {
+      const fileDataUri = getDataUri(file);
+      const myCloud = await cloudinary.v2.uploader.upload(fileDataUri.content);
+      const image = {
+          public_id: myCloud.public_id,
+          url: myCloud.secure_url,
+      };
+      images.push(image);
+  }
+
+  product.images.push(...images);
   await product.save();
 
   res.status(200).json({
-    success: true,
-    message: "Image Added Successfully",
+      success: true,
+      message: "Images Added Successfully",
   });
 });
+
 
 export const deleteProductImage = asyncError(async (req, res, next) => {
   const product = await Product.findById(req.params.id);
