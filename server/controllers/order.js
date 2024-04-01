@@ -6,6 +6,7 @@ import ErrorHandler from "../utils/error.js";
 import { preparingTemplate, shippedTemplate, deliveredTemplate } from "../utils/emailHTMLTemplate.js";
 import { sendEmail } from "../utils/features.js";
 import { sendReceipt } from '../utils/sendReceipt.js';
+import { receiptEmail } from '../utils/receiptEmail.js';
 
 export const processPayment = asyncError(async (req, res, next) => {
   const { totalAmount } = req.body;
@@ -69,7 +70,7 @@ export const createOrder = asyncError(async (req, res, next) => {
   //   console.error("Error sending email:", error);
   // }
 
-  await sendReceipt(order);
+  await receiptEmail(order);
 
   res.status(201).json({
     success: true,

@@ -1,4 +1,4 @@
-// const User = require('../models/user');
+import { User } from '../models/user.js';
 
 const passwordResetEmailTemplate = `
 <!DOCTYPE html>
@@ -20,8 +20,8 @@ const passwordResetEmailTemplate = `
 </html>
 `;
 
-const preparingTemplate = (order) => {
-    // const user = await User.findOne(order.user);
+export const preparingTemplate = async (order) => {
+    const user = await User.findOne(order.user);
 
     const orderItemsTable = `
         <table style="border-collapse: collapse; width: 100%;">
@@ -152,4 +152,4 @@ const deliveredTemplate = (order) => {
 };
 
 
-export { passwordResetEmailTemplate, preparingTemplate, shippedTemplate, deliveredTemplate };
+export { passwordResetEmailTemplate, shippedTemplate, deliveredTemplate };
