@@ -37,20 +37,24 @@ export const cookieOptions = {
 };
 
 export const sendEmail = async (subject, to, html) => {
-    const transporter = createTransport({
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT,
-        auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+  const transporter = createTransport({
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
     },
-});
+  });
 
-await transporter.sendMail({
-    to,
-    subject,
-    html,
+  try {
+    await transporter.sendMail({
+      to,
+      subject,
+      html,
     });
+  } catch (error) {
+    console.error("Error in sendEmail:", error);
+    throw error;  // re-throw the error to be caught in createOrder
+  }
 };
-
 
