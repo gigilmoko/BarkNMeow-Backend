@@ -194,6 +194,25 @@ export const updatePic = asyncError(async (req, res, next) => {
   });
 });
 
+export const deleteUser = asyncError(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  if (!user) return next(new ErrorHandler("User Not Found", 404));
+  const users = await User.find({ user: user._id });
+
+  for (let i = 0; i < users.length; i++) {
+      const user = users[i];
+      user.user = undefined;
+      await user.save();
+  }
+
+  await user.deleteOne();
+
+  res.status(200).json({
+  success: true,
+  message: "user Deleted Successfully",
+  });
+});
+
 
 export const forgetPassword = asyncError(async (req, res, next) => {
   const { email } = req.body;

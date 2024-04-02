@@ -10,6 +10,8 @@ import {
   signup,
   updatePic,
   updateProfile,
+  getAllUsers,
+  deleteUser,
 } from "../controllers/user.js";
 import {   
   isAdmin,
@@ -24,6 +26,9 @@ router.post("/new", singleUpload, signup);
 router.get("/me", isAuthenticated, getMyProfile);
 router.get("/logout", isAuthenticated, logOut);
 router.post("/verifyidtoken", verifyIdToken, googleLogin);
+router.get("/admin/all", isAuthenticated, isAdmin, getAllUsers);
+router.delete("/delete/:id", isAuthenticated, isAdmin, deleteUser);
+
 
 // Updating Routes
 router.put("/updateprofile", isAuthenticated, updateProfile);
