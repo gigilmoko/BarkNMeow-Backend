@@ -107,12 +107,52 @@ export const getOrderDetails = asyncError(async (req, res, next) => {
   });
 });
 
+// export const proccessOrder = asyncError(async (req, res, next) => {
+//   const order = await Order.findById(req.params.id);
+//   if (!order) return next(new ErrorHandler("Order Not Found", 404));
+
+//   if (order.orderStatus === "Preparing") {
+//     order.orderStatus = "Shipped";
+    
+//     try {
+//       await sendEmail("Order Shipped", req.user.email, shippedTemplate(order));
+//     } catch (error) {
+//       console.error("Error sending email:", error);
+//     }
+
+//   } else if (order.orderStatus === "Shipped") {
+//     order.orderStatus = "Delivered";
+//     order.deliveredAt = new Date(Date.now());
+
+//     try {
+//       await sendEmail("Order Delivered", req.user.email, deliveredTemplate(order));
+//     } catch (error) {
+//       console.error("Error sending email:", error);
+
+//     }
+
+//   } else {
+//     return next(new ErrorHandler("Order Already Delivered", 400));
+//   }
+
+//   await order.save();
+
+//   res.status(200).json({
+//     success: true,
+//     message: "Order Processed Successfully",
+//   });
+// });
+
+// PIE CHART
+
 export const proccessOrder = asyncError(async (req, res, next) => {
   const order = await Order.findById(req.params.id);
   if (!order) return next(new ErrorHandler("Order Not Found", 404));
 
-  if (order.orderStatus === "Preparing") {
-    order.orderStatus = "Shipped";
+  const newStatus = req.body.status; // Get the new status from the request body
+
+  if (newStatus === "Shipped" && order.orderStatus === "Preparing") {
+    order.orderStatus = newStatus;
     
     try {
       await sendEmail("Order Shipped", req.user.email, shippedTemplate(order));
@@ -120,19 +160,18 @@ export const proccessOrder = asyncError(async (req, res, next) => {
       console.error("Error sending email:", error);
     }
 
-  } else if (order.orderStatus === "Shipped") {
-    order.orderStatus = "Delivered";
+  } else if (newStatus === "Delivered" && order.orderStatus === "Shipped") {
+    order.orderStatus = newStatus;
     order.deliveredAt = new Date(Date.now());
 
     try {
       await sendEmail("Order Delivered", req.user.email, deliveredTemplate(order));
     } catch (error) {
       console.error("Error sending email:", error);
-
     }
 
   } else {
-    return next(new ErrorHandler("Order Already Delivered", 400));
+    return next(new ErrorHandler("Invalid Status Update", 400));
   }
 
   await order.save();
@@ -143,7 +182,6 @@ export const proccessOrder = asyncError(async (req, res, next) => {
   });
 });
 
-// PIE CHART
 export const getOrderDetailsCount = asyncError(async (req, res, next) => {
   console.log('Received request:', req);
   const orderDetails = await Order.aggregate([
