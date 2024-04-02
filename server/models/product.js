@@ -30,4 +30,13 @@ const schema = new mongoose.Schema({
   },
 });
 
+schema.virtual('categoryRef', {
+  ref: 'Category',
+  localField: 'category',
+  foreignField: '_id',
+  justOne: true,
+  options: { select: 'category' } 
+});
+
+
 export const Product = mongoose.model("Product", schema);
