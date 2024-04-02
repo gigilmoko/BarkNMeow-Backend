@@ -329,3 +329,59 @@ export const getOrdersSumByMonth = async (req, res) => {
   }
 };
 
+//Bar chart
+export const getMostOrderedProduct = async (req, res) => {
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  try {
+    const mostOrderedProduct = await Order.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: startOfMonth }
+        }
+      },
+      { $unwind: "$orderItems" },
+      {
+        $group: {
+          _id: "$orderItems.product",
+          count: { $sum: "$orderItems.quantity" }
+        }
+      },
+      {
+        $sort: { count: -1 }
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "_id",
+          foreignField: "_id",
+          as: "product"
+        }
+      },
+      { $unwind: "$product" },
+      {
+        $project: {
+          _id: 0,
+          name: "$product.name",
+          count: 1
+        }
+      },
+      {
+        $limit: 3
+      }
+    ]);
+
+    console.log(mostOrderedProduct);
+    res.status(200).json({
+      success: true,
+      mostOrderedProduct
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'An error occurred while fetching the most ordered product.'
+    });
+  }
+};
