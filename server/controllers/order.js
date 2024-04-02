@@ -144,26 +144,28 @@ export const proccessOrder = asyncError(async (req, res, next) => {
 });
 
 // PIE CHART
-export const getOrderDetailsCount = async () => {
-  try {
-    const orderDetails = await Order.aggregate([
-      {
-        $group: {
-          _id: "$orderStatus",
-          count: { $sum: 1 },
-        },
+export const getOrderDetailsCount = asyncError(async (req, res, next) => {
+  console.log('Received request:', req);
+  const orderDetails = await Order.aggregate([
+    {
+      $group: {
+        _id: "$orderStatus",
+        count: { $sum: 1 },
       },
-    ]);
+    },
+  ]);
 
-    return orderDetails.map(detail => ({
-      status: detail._id,
-      count: detail.count,
-    }));
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
+  console.log(orderDetails);
+  const response = orderDetails.map(detail => ({
+    status: detail._id,
+    count: detail.count,
+  }));
+
+  res.status(200).json({
+    success: true,
+    orderDetails: response,
+  });
+});
 
 /* export const getOrdersCountByDay = asyncError(async (req, res, next) => {
   const startOfToday = new Date();
@@ -251,7 +253,8 @@ res.status(200).json({
   });
 }); */
 
-/* export const getOrdersSumByMonth = async (req, res) => {
+//line chart
+export const getOrdersSumByMonth = async (req, res) => {
   const threeMonthsAgo = new Date();
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
 
@@ -286,5 +289,5 @@ res.status(200).json({
       message: 'An error occurred while fetching the orders sum by month.'
     });
   }
-}; */
+};
 
