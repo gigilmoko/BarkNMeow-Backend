@@ -5,8 +5,9 @@ import { stripe } from "../server.js";
 import ErrorHandler from "../utils/error.js";
 import { preparingTemplate, shippedTemplate, deliveredTemplate } from "../utils/emailHTMLTemplate.js";
 import { sendEmail } from "../utils/features.js";
-import { sendReceipt } from '../utils/sendReceipt.js';
 import { receiptEmail } from '../utils/receiptEmail.js';
+import { shippedEmail } from '../utils/shippedEmail.js';
+import { deliveredEmail } from '../utils/deliveredEmail.js';
 
 export const processPayment = asyncError(async (req, res, next) => {
   const { totalAmount } = req.body;
@@ -155,7 +156,7 @@ export const proccessOrder = asyncError(async (req, res, next) => {
     order.orderStatus = newStatus;
     
     try {
-      await sendEmail("Order Shipped", req.user.email, shippedTemplate(order));
+      await shippedEmail(order);;
     } catch (error) {
       console.error("Error sending email:", error);
     }
@@ -165,7 +166,7 @@ export const proccessOrder = asyncError(async (req, res, next) => {
     order.deliveredAt = new Date(Date.now());
 
     try {
-      await sendEmail("Order Delivered", req.user.email, deliveredTemplate(order));
+      await deliveredEmail(order);
     } catch (error) {
       console.error("Error sending email:", error);
     }
